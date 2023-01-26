@@ -64,10 +64,11 @@ export const App = () => {
 
 
       <div className='main'>
+
         {user ? (
           <Fragment>
             <div className="user" onClick={logout}>
-              {user.username} 🚪
+              {user.username || user.profile.name} 🚪
             </div>
             
             <TaskForm user={user} />
