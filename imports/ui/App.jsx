@@ -1,13 +1,19 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { useTracker } from 'meteor/react-meteor-data';
 import { TasksCollection } from '../api/TasksCollection';
 import { Task } from './Task';
 import { TaskForm } from './TaskForm';
 
 export const App = () => {
-  const tasks = useTracker(() => TasksCollection.find({}, {sort: {createAt: -1}}).fetch());
-  const deleteTask =({_id}) => TasksCollection.remove(_id);
 
+  const [hideCompleted, setHideCompleted] = useState(false);
+  const hideCompletedFilter = { isChecked: { $ne: true } };
+  const tasks = useTracker(() =>
+    TasksCollection.find(hideCompleted ? hideCompletedFilter : {}, {
+      sort: { createdAt: -1 },
+    }).fetch()
+  );
+  const deleteTask =({_id}) => TasksCollection.remove(_id);
   const toggleChecked = ({ _id, isChecked}) => {
     TasksCollection.update(_id, {
       $set:{
@@ -27,6 +33,12 @@ export const App = () => {
       </header>
     <div className='main'>
       <TaskForm />
+
+      <div className='filter'>
+        <button onClick={() => setHideCompleted(!hideCompleted)}>
+          {hideCompleted ? 'Show All' : 'Hide Completed'}
+        </button>
+      </div>
 
       <ul className='tasks'>
         {tasks.map(task => <Task 
